@@ -27,7 +27,29 @@ class expense(models.Model):
     def get_absolute_url(self):
         return reverse('blog_detail', kwargs={'cislo':self.id})
 
+class ledger(models.Model):
+    id = models.IntegerField(max_length=50)
+    name = models.CharField(max_length=50)
+    owner_id = models.IntegerField(max_length=50)
 
+    def __str__(self):
+        return f'[{self.id}]  {self.title}'
+
+    def get_absolute_url(self):
+        return reverse('blog_detail', kwargs={'cislo':self.id})
+
+class relation(models.Model):
+    id = models.IntegerField(max_length=50)
+    ledger_id = models.IntegerField(max_length=50)
+    expense_id = models.IntegerField(max_length=50)
+    user_id = models.IntegerField(max_length=50)
+    relation = models.DecimalField(int =3)
+
+    def __str__(self):
+        return f'[{self.id}]  {self.title}'
+
+    def get_absolute_url(self):
+        return reverse('blog_detail', kwargs={'cislo':self.id})
 
 # Django Object-Relational Mapper (ORM) - API
 # Hromada příkazů na ruční zadávání prvků do databáze atp.
