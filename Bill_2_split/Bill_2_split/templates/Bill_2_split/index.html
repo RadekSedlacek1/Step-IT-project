@@ -1,0 +1,32 @@
+{% extends 'Bill_2_split/_base.html' %}
+
+{% block Bill_2_split_content %}
+{% load static %}
+<h1>
+    This is index page of application Bill 2 split
+</h1>
+
+<div>
+    <a href="list_of_ledgers/">
+        <img class="img" src="{% static 'Bill_2_split/images/list_of_ledgers.png' %}">
+    </a>
+
+    <a href="ledger_detail/">
+        <img class="img" src="{% static 'Bill_2_split/images/ledger_detail.png' %}">
+    </a>
+
+    <a href="payment_detail/">
+        <img class="img" src="{% static 'Bill_2_split/images/payment_detail.png' %}">
+    </a>
+
+</div>
+
+<ul>
+    {% for user in view.get_users %}
+
+    <li>{{ user.name }}</li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

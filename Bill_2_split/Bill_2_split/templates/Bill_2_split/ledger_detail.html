@@ -1,0 +1,22 @@
+{% extends 'Bill_2_split/_base.html' %}
+
+{% block Bill_2_split_content %}
+{% load static %}
+
+<h1>
+    This is specific ledger detail
+</h1>
+
+<div>
+    <img class="img" src="{% static 'Bill_2_split/images/ledger_detail.png' %}">
+</div>
+
+<ul>
+    {% for payment in view.get_payment %}
+
+    <li>{{ expense.name }}</li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

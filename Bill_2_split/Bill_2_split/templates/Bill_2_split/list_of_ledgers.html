@@ -1,0 +1,22 @@
+{% extends 'Bill_2_split/_base.html' %}
+
+{% block Bill_2_split_content %}
+{% load static %}
+
+<h1>
+    This is list of ledgers
+</h1>
+
+<div>
+    <img class="img" src="{% static 'Bill_2_split/images/list_of_ledgers.png' %}">
+</div>
+
+<ul>
+    {% for ledger in view.get_ledgers %}
+
+    <li>{{ ledger.name }}</li>
+
+    {% endfor %}
+</ul>
+
+{% endblock %}

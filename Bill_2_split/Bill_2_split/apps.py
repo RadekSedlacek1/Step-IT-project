@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class FirstAppConfig(AppConfig):
+class Bill2SplitConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'first_app'
+    name = 'Bill_2_split'
