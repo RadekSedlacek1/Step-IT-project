@@ -12,9 +12,9 @@
 </div>
 
 <ul>
-    {% for payment in view.get_payment %}
+    {% for payment in view.get_payments %}
 
-    <li>{{ expense.name }}</li>
+    <li>{{ payment.name }}</li>
 
     {% endfor %}
 </ul>

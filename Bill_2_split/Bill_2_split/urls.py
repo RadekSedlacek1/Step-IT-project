@@ -21,18 +21,15 @@ urlpatterns = [
          views.IndexView.as_view(),
          name='IndexView'),
 
-    path('list_of_ledgers/',
-         # path('list_of_ledgers/<int:pk_user>/<slug:slug>',
+    path('list_of_ledgers/<int:pk>/',
          views.ListOfLedgersView.as_view(),
          name='ListOfLedgersView'),
 
-    path('ledger_detail/',
-         # path('ledger_detail/<int:pk_ledger>/<slug:slug>/',
+    path('ledger_detail/<int:pk>/',
          views.LedgerDetailView.as_view(),
          name='LedgerDetailView'),
 
-    path('payment_detail/',
-         # path('payment_detail/<int:pk_payment>/<slug:slug>/',
+    path('payment_detail/<int:pk>/',
          views.PaymentDetailView.as_view(),
          name='PaymentDetailView'),
 ]

@@ -8,52 +8,29 @@ class IndexView(generic.TemplateView):
 
     def get_users(self):
         return User.objects.all()
-    def get_ledgers(self):
-        return Ledger.objects.all()
-    def get_payment(self):
-        return Payment.objects.all()
 
-    def get_relation(self):
-        return Relation.objects.all()
-
-class ListOfLedgersView(generic.TemplateView):
+class ListOfLedgersView(generic.DetailView):
+    model = Ledger
     template_name = 'Bill_2_split/list_of_ledgers.html'
     title = 'List of ledgers'
 
-    def get_users(self):
-        return User.objects.all()
     def get_ledgers(self):
         return Ledger.objects.all()
-    def get_payment(self):
-        return Payment.objects.all()
 
-    def get_relation(self):
-        return Relation.objects.all()
 
-class LedgerDetailView(generic.TemplateView):
+class LedgerDetailView(generic.DetailView):
+    model = Payment
     template_name = 'Bill_2_split/ledger_detail.html'
     title = 'Ledger detail'
 
-    def get_users(self):
-        return User.objects.all()
-    def get_ledgers(self):
-        return Ledger.objects.all()
-    def get_payment(self):
+    def get_payments(self):
         return Payment.objects.all()
 
-    def get_relation(self):
-        return Relation.objects.all()
 
-class PaymentDetailView(generic.TemplateView):
+class PaymentDetailView(generic.DetailView):
+    model = Relation
     template_name = 'Bill_2_split/payment_detail.html'
     title = 'Payment detail'
 
-    def get_users(self):
-        return User.objects.all()
-    def get_ledgers(self):
-        return Ledger.objects.all()
-    def get_payment(self):
-        return Payment.objects.all()
-
-    def get_relation(self):
+    def get_relations(self):
         return Relation.objects.all()

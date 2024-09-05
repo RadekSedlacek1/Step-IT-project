@@ -14,25 +14,32 @@ class AbstractBase(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug and self.name:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.name + self.pk)
         super().save(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        # First save to generate primary key
+        if not self.pk:
+            super().save(*args, **kwargs)
+
+        # Save slug using primary key
+        if not self.slug and self.name:
+            self.slug = slugify(self.name + str(self.pk))
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse('blog_detail', kwargs={'cislo': self.id})
-
 
 class User(AbstractBase):
     email = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=50, blank=True)
     # If no e-mail and password == user does not have an account yet, but can be established
 
-
 class Ledger(AbstractBase):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     # meaning of user - is the owner of the Ledger, can edit it
+    def get_absolute_url(self):
+        return reverse('Bill_2_split:ListOfLedgersView', kwargs={'slug': self.slug})
 
 
 class Payment(AbstractBase):
@@ -42,6 +49,9 @@ class Payment(AbstractBase):
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     payment_time = models.DateTimeField(default=datetime.now)
     # meaning of user - is the owner of the entry, can edit it
+
+    def get_absolute_url(self):
+        return reverse('Bill_2_split:PaymentDetailView', kwargs={'slug': self.slug})
 
 
 class Relation(models.Model):
