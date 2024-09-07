@@ -1,0 +1,17 @@
+{% extends 'Bill_2_split/_base.html' %}
+
+{% block Bill_2_split_content %}
+{% load static %}
+
+<h1>Add new ledger</h1>
+    <form action="{% url 'Bill_2_split:LedgerAdd' user_pk=user.pk %}" method="POST">
+
+        {% csrf_token %}
+
+        {{ form }}
+
+        <button type="submit">Create new ledger</button>
+    </form>
+
+
+{% endblock %}

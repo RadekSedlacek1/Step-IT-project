@@ -18,13 +18,12 @@ class AbstractBase(models.Model):
         super().save(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        # First save to generate primary key
-        if not self.pk:
-            super().save(*args, **kwargs)
-
-        # Save slug using primary key
         if not self.slug and self.name:
+            # Uložení slug až po vytvoření primárního klíče
+            super().save(*args, **kwargs)
             self.slug = slugify(self.name + str(self.pk))
+            super().save(update_fields=['slug'])
+        else:
             super().save(*args, **kwargs)
 
     def __str__(self):
@@ -33,13 +32,13 @@ class AbstractBase(models.Model):
 class User(AbstractBase):
     email = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=50, blank=True)
-    # If no e-mail and password == user does not have an account yet, but can be established
+    # If no e-mail and password => user does not have an account yet, but can be established
 
 class Ledger(AbstractBase):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     # meaning of user - is the owner of the Ledger, can edit it
     def get_absolute_url(self):
-        return reverse('Bill_2_split:ListOfLedgersView', kwargs={'slug': self.slug})
+        return reverse('Bill_2_split:ListOfLedgersView', kwargs={'pk': self.user.pk})
 
 
 class Payment(AbstractBase):
@@ -56,6 +55,5 @@ class Payment(AbstractBase):
 
 class Relation(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    ledger = models.ForeignKey(Ledger, on_delete=models.PROTECT)
     payment = models.ForeignKey(Payment, on_delete=models.PROTECT)
     relation = models.DecimalField(max_digits=10, decimal_places=3)

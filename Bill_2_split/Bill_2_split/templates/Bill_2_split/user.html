@@ -4,16 +4,15 @@
 {% load static %}
 
 <nav>
-    <ul><li></li></ul>
-
-    <ul>
-        <li><a href="{% url 'Bill_2_split:IndexView' %}">
-            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"></a></li>
-    </ul>
+    <ul><li><a href="{% url 'Bill_2_split:IndexView' %}">
+            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"></a></li></ul>
 
     <ul>
         <li><a href="{% url 'Bill_2_split:UserView' %}">
             <img src="{% static 'Bill_2_split/icons/user.png' %}"></a></li>
+    </ul>
+
+    <ul>
         <li><a href=""><img src="{% static 'Bill_2_split/icons/bw_ledgers.png' %}"></a></li>
         <li><a href=""><img src="{% static 'Bill_2_split/icons/bw_ledger.png' %}"></a></li>
         <li><a href=""><img src="{% static 'Bill_2_split/icons/bw_glass.png' %}"></a></li>
@@ -21,14 +20,15 @@
 </nav>
 
 <h1>
-    This is index page of application Bill 2 split
+    This is a page to choose an user {{ object.name }}
 </h1>
 
-
 <ul>
-    {% for user in view.get_users %}
+    {% for user in users %}
 
-    <li>{{ user.name }}</li>
+    <li>
+        <a href="{% url 'Bill_2_split:ListOfLedgersView' user.pk%}"> {{ user.name }} </a>
+    </li>
 
     {% endfor %}
 </ul>

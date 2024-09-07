@@ -3,20 +3,52 @@
 {% block Bill_2_split_content %}
 {% load static %}
 
+<nav>
+    <ul><li><a href="{% url 'Bill_2_split:IndexView' %}">
+            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"></a></li>
+    <li><a href="{% url 'Bill_2_split:UserView' %}">
+            <img src="{% static 'Bill_2_split/icons/user.png' %}"></a></li>
+    <li><a href="{% url 'Bill_2_split:ListOfLedgersView' user.pk %}">
+            <img src="{% static 'Bill_2_split/icons/ledgers.png' %}"></a></li></ul>
+
+    <ul>
+        <li><a href="{% url 'Bill_2_split:LedgerDetailView' ledger.pk user.pk %}">
+            <img src="{% static 'Bill_2_split/icons/ledger.png' %}"></a></li>
+    </ul>
+
+    <ul>
+        <li><a href=""><img src="{% static 'Bill_2_split/icons/bw_glass.png' %}"></a></li>
+    </ul>
+</nav>
+
 <h1>
-    This is specific ledger detail
+    This is specific ledger detail of {{ ledger.name }}
 </h1>
 
-<div>
-    <img class="img" src="{% static 'Bill_2_split/images/ledger_detail.png' %}">
-</div>
-
 <ul>
-    {% for payment in view.get_payments %}
+    {% for payment in payments %}
 
-    <li>{{ payment.name }}</li>
+    <li>
+        <a href="{% url 'Bill_2_split:PaymentDetailView' payment.pk ledger.pk user.pk %}"> {{ payment.name }} </a>
+    </li>
 
     {% endfor %}
 </ul>
+
+<nav>
+    <ul>
+        <li>
+            <a href="#"> Edit ledger</a>
+        </li>
+
+        <li>
+            <a href="#"> Delete ledger</a>
+        </li>
+
+        <li>
+            <a href="#"> Add new payment</a>
+        </li>
+    </ul>
+</nav>
 
 {% endblock %}
