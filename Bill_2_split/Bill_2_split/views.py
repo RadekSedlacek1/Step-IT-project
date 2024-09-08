@@ -19,14 +19,15 @@ class UserView(generic.TemplateView):
         context['users'] = User.objects.all()
         return context
 
-class ListOfLedgersView(generic.DetailView):
-    model = User
+class ListOfLedgersView(generic.TemplateView):
     template_name = 'Bill_2_split/list_of_ledgers.html'
     title = 'List of ledgers'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.get_object()  # získej uživatele podle pk
+        user_id = self.kwargs.get('user_pk')
+        user = User.objects.get(pk=user_id)  # získej uživatele podle pk
+        context['user'] = user
         context['ledgers'] = Ledger.objects.filter(payment__relation__user=user).distinct()  # vyfiltruj ledgery pro daného uživatele
         return context
 
@@ -46,13 +47,10 @@ class LedgerAdd(generic.CreateView):
         user_id = self.kwargs.get('user_pk')
         user = User.objects.get(pk=user_id)
 
-        #ulož prázdný ledger
+        # Ulož prázdný ledger
         form.instance.user = user
         response = super().form_valid(form)
         ledger = form.instance
-
-        # Uložení prázdného ledgeru
-        form.instance.save()
 
         # Zkontroluj, zda již payment neexistuje
         payment, created = Payment.objects.get_or_create(
@@ -76,18 +74,25 @@ class LedgerAdd(generic.CreateView):
             }
         )
 
-        return HttpResponseRedirect(reverse('Bill_2_split:ListOfLedgersView', kwargs={'pk': user.pk}))
+        # Přesměruj na správnou URL
+        return HttpResponseRedirect(reverse('Bill_2_pay:ListOfLedgersView', kwargs={'user_pk': user.pk}))
 
 class LedgerDetailView(generic.DetailView):
     model = Ledger
     template_name = 'Bill_2_split/ledger_detail.html'
     title = 'Ledger detail'
 
+    def get_object(self):
+        ledger_pk = self.kwargs.get('ledger_pk')
+        return Ledger.objects.get(pk=ledger_pk)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ledger = self.get_object()
 
+        ledger_id = self.kwargs.get('ledger_pk')
         user_id = self.kwargs.get('user_pk')
+
+        ledger = Ledger.objects.get(pk=ledger_id)
         user = User.objects.get(pk=user_id)
 
         context['ledger'] = ledger
@@ -96,11 +101,39 @@ class LedgerDetailView(generic.DetailView):
 
         return context
 
+class PaymentAdd(generic.CreateView):
+    model = Payment
+    template_name = 'Bill_2_split/payment_add.html'
+    fields = ['name', 'cost', 'desc']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ledger_id = self.kwargs.get('ledger_pk')
+        ledger = Ledger.objects.get(pk=ledger_id)
+        context['ledger'] = ledger
+        return context
+
+    def form_valid(self, form):
+        ledger_id = self.kwargs.get('ledger_pk')
+        user_id = self.kwargs.get('user_pk')
+        ledger = Ledger.objects.get(pk=ledger_id)
+        user = User.objects.get(pk=user_id)
+
+        form.instance.ledger = ledger
+        form.instance.user = user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('Bill_2_pay:LedgerDetailView', kwargs={'ledger_pk': self.object.ledger.pk, 'user_pk': self.object.user.pk})
 
 class PaymentDetailView(generic.DetailView):
     model = Payment
     template_name = 'Bill_2_split/payment_detail.html'
     title = 'Payment detail'
+
+    def get_object(self):
+        payment_pk = self.kwargs.get('payment_pk')
+        return Payment.objects.get(pk=payment_pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

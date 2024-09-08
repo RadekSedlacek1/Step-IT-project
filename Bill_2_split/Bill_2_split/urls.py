@@ -15,7 +15,7 @@ urlpatterns = [
          views.UserView.as_view(),
          name='UserView'),
 
-    path('list_of_ledgers/<int:pk>/',
+    path('list_of_ledgers/<int:user_pk>/',
          views.ListOfLedgersView.as_view(),
          name='ListOfLedgersView'),
 
@@ -23,11 +23,15 @@ urlpatterns = [
          views.LedgerAdd.as_view(),
          name='LedgerAdd'),
 
-    path('ledger_detail/<int:pk>/<int:user_pk>/',
+    path('ledger_detail/<int:ledger_pk>/<int:user_pk>/',
          views.LedgerDetailView.as_view(),
          name='LedgerDetailView'),
 
-    path('payment_detail/<int:pk>/<int:ledger_pk>/<int:user_pk>/',
+    path('ledger_detail/<int:ledger_pk>/<int:user_pk>/add',
+         views.PaymentAdd.as_view(),
+         name='PaymentAdd'),
+
+    path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/',
          views.PaymentDetailView.as_view(),
          name='PaymentDetailView'),
 ]

@@ -38,7 +38,7 @@ class Ledger(AbstractBase):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     # meaning of user - is the owner of the Ledger, can edit it
     def get_absolute_url(self):
-        return reverse('Bill_2_split:ListOfLedgersView', kwargs={'pk': self.user.pk})
+        return reverse('Bill_2_split:ListOfLedgersView', kwargs={'user_pk': self.user.pk})
 
 
 class Payment(AbstractBase):
