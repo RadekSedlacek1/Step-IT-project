@@ -27,9 +27,13 @@ urlpatterns = [
          views.LedgerDetailView.as_view(),
          name='LedgerDetailView'),
 
-    path('ledger_detail/<int:ledger_pk>/<int:user_pk>/add',
-         views.PaymentAdd.as_view(),
-         name='PaymentAdd'),
+    path('ledger_detail/<int:ledger_pk>/<int:user_pk>/add/',
+         views.PaymentAddView.as_view(),
+         name='PaymentAddView'),
+
+    path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/add/',
+         views.RelationsAddView.as_view(),
+         name='RelationsAddView'),
 
     path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/',
          views.PaymentDetailView.as_view(),

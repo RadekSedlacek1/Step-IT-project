@@ -1,0 +1,26 @@
+{% extends 'Bill_2_split/_base.html' %}
+
+{% block Bill_2_split_content %}
+<h1>Detail Payment: {{ payment.name }}</h1>
+<p>Cost: {{ payment.cost }}</p>
+<p>Description: {{ payment.desc }}</p>
+
+<h2>Ledger: {{ ledger.name }}</h2>
+<p>Managed by: {{ user.username }}</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <h2>Add Relations for Users</h2>
+
+    {% for form in relation_forms %}
+        <div>
+            <h3>User: {{ form.instance.user.username }}</h3>
+            {{ form.as_p }}
+        </div>
+    {% endfor %}
+
+    <button type="submit">Add Relations</button>
+</form>
+
+{% endblock %}
