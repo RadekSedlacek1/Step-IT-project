@@ -43,6 +43,10 @@ urlpatterns = [
          views.PaymentEditView.as_view(),
          name='PaymentEditView'),
 
+    path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/delete/',
+         views.PaymentDeleteView.as_view(),
+         name='PaymentDeleteView'),
+
     path('relation_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/add/',
          views.RelationsAddView.as_view(),
          name='RelationsAddView'),

@@ -69,7 +69,10 @@
     <ul></ul>
     <ul>
         <li>
-            <a href="#"> Delete payment</a>
+            <form method="post" action="{% url 'Bill_2_split:PaymentDeleteView' payment_pk=payment.pk ledger_pk=ledger.pk user_pk=user.pk %}">
+                {% csrf_token %}
+                <button type="submit">Delete payment</button>
+            </form>
         </li>
 
     </ul>

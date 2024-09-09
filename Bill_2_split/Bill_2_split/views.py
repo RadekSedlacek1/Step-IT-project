@@ -1,13 +1,13 @@
 
-from django.views import generic
+from django.views import generic, View
 from Bill_2_split.models import User, Ledger, Payment, Relation
 from .functions import calculate_relation_costs
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from datetime import datetime
 from .forms import RelationForm
 from django.shortcuts import redirect, get_object_or_404
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, DeleteView
 
 class IndexView(generic.TemplateView):
     template_name = 'Bill_2_split/index.html'
@@ -79,6 +79,7 @@ class LedgerAddView(generic.CreateView):
 
         return HttpResponseRedirect(reverse('Bill_2_pay:ListOfLedgersView', kwargs={'user_pk': user.pk}))
 
+
 class LedgerDetailView(generic.DetailView):
     model = Ledger
     template_name = 'Bill_2_split/ledger_detail.html'
@@ -91,17 +92,50 @@ class LedgerDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        ledger_id = self.kwargs.get('ledger_pk')
+        ledger = self.get_object()
         user_id = self.kwargs.get('user_pk')
-
-        ledger = Ledger.objects.get(pk=ledger_id)
         user = User.objects.get(pk=user_id)
 
+        # Retrieve payments and relations for the ledger
+        payments = Payment.objects.filter(ledger=ledger)
+        relations = Relation.objects.filter(payment__in=payments)
+
+        # Get users associated with the ledger through relations
+        ledger_users = User.objects.filter(relation__in=relations).distinct()
+
+        # Calculate balance for each user
+        user_balances = []
+        for user in ledger_users:
+            # Get all relations for this user and ledger
+            user_relations = relations.filter(user=user)
+
+            # Calculate the total balance for this user
+            balance = sum(
+                payment.cost * relation.relation
+                for payment in payments
+                for relation in user_relations
+                if relation.payment == payment
+            )
+
+            # Format the balance
+            balance_str = f"{user.name}: {balance:+.2f}"
+            user_balances.append(balance_str)
+
+            # Debug print statement
+            print(f'User: {user.name}, Balance: {balance}')
+
+        # Adding context
+        context['relations'] = relations
         context['ledger'] = ledger
+        context['ledger_users'] = ledger_users
+        context['payments'] = payments
         context['user'] = user
-        context['payments'] = Payment.objects.filter(ledger=ledger)
+        context['user_balances'] = user_balances
 
         return context
+
+
+
 
 class LedgerEditView(UpdateView):
     model = Ledger
@@ -150,6 +184,10 @@ class PaymentAddView(generic.CreateView):
 
         form.instance.ledger = ledger
         form.instance.user = user
+        relation_value = self.request.POST.get('relation', '0')
+        if int(relation_value) != 0:                                # Udělej zápis jen pro relatiok které má smysl - ne všechny uživatele
+            Relation.objects.create(user=user, ledger=ledger, relation=int(relation_value))
+
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -219,6 +257,26 @@ class PaymentEditView(UpdateView):
                            'ledger_pk': ledger.pk,
                            'user_pk': user_id
         })
+
+#
+class PaymentDeleteView(View):
+
+    def post(self, request, *args, **kwargs):
+        payment_pk = self.kwargs.get('payment_pk')
+        ledger_pk = self.kwargs.get('ledger_pk')
+        user_pk = self.kwargs.get('user_pk')
+
+        payment = get_object_or_404(Payment, pk=payment_pk)
+        # Smažte všechny vztahy související s tímto platbou
+        Relation.objects.filter(payment=payment).delete()
+        # Smažte samotnou platbu
+        payment.delete()
+
+        # Přesměrování zpět na detail ledgeru
+        return redirect('Bill_2_split:LedgerDetailView', ledger_pk=ledger_pk, user_pk=user_pk)
+
+#
+
 class RelationsAddView(generic.DetailView):
     model = Payment
     template_name = 'Bill_2_split/relation_add.html'
@@ -281,19 +339,19 @@ class RelationsEditView(UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
 
-        users = User.objects.all()
-        for user in users:
-            form_prefix = str(user.id)
-            relation_form = RelationForm(self.request.POST, prefix=form_prefix)
+        relations = Relation.objects.filter(payment__ledger=self.object.ledger)         # Vrať mi formulář pro všechny uživatele ledgeru
+
+        for relation in relations:
+            form_prefix = str(relation.user.id)
+            relation_form = RelationForm(self.request.POST, prefix=form_prefix, instance=relation)
+
             if relation_form.is_valid():
-                relation = relation_form.save(commit=False)
-                relation.payment = self.object
-                relation.save()
+                relation_form.save()
+                print(f"Relation for user {relation.user.id} was successfully updated.")
             else:
                 print(f"Form with prefix {form_prefix} is invalid: {relation_form.errors}")
 
         return response
-
     def get_success_url(self):
         ledger = self.object.ledger
         user_id = self.kwargs.get('user_pk')

@@ -18,6 +18,7 @@ class RelationForm(forms.ModelForm):
             'relation': forms.NumberInput(attrs={'placeholder': 'Relation Value'}),
         }
 
+
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         label='Username',

@@ -6,21 +6,18 @@
 <p>Description: {{ payment.desc }}</p>
 
 <h2>Ledger: {{ ledger.name }}</h2>
-<p>Managed by: {{ user.name }}</p>
+<p>Managed by: {{ user.username }}</p>
 
-<form method="post">
+<form method="POST">
     {% csrf_token %}
+    {{ form.as_p }}  <!-- Hlavní formulář -->
 
-    <h2>Edit Relations for Users</h2>
-
-    {% for form in relation_forms %}
-        <div>
-            <h3>User: {{ form.instance.user.username }}</h3>
-            {{ form.as_p }}
-        </div>
+    {% for relation_form in relation_forms %}
+        {{ relation_form.management_form }}  <!-- Skrytá pole pro správu forem -->
+        {{ relation_form.as_p }}  <!-- Zobrazení jednotlivých formulářů vztahů -->
     {% endfor %}
 
-    <button type="submit">Save Changes</button>
+    <button type="submit">Save changes</button>
 </form>
 
 {% endblock %}
