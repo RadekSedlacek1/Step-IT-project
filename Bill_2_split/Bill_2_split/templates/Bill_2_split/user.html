@@ -5,11 +5,11 @@
 
 <nav>
     <ul><li><a href="{% url 'Bill_2_split:IndexView' %}">
-            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"></a></li></ul>
+            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"><span>Homepage</span></a></li></ul>
 
     <ul>
         <li><a href="{% url 'Bill_2_split:UserView' %}">
-            <img src="{% static 'Bill_2_split/icons/user.png' %}"></a></li>
+            <img src="{% static 'Bill_2_split/icons/user.png' %}"><span>You are here</span></a></li>
     </ul>
 
     <ul>
@@ -20,8 +20,12 @@
 </nav>
 
 <h1>
-    This is a page to choose an user {{ object.name }}
+    Select a User
 </h1>
+
+<p>
+    Please select a user from the list below to continue. User registration and login features are not yet available, but this will allow you to proceed in this demo.
+</p>
 
 <ul>
     {% for user in users %}

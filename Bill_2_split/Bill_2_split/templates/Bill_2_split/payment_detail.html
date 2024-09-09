@@ -5,17 +5,17 @@
 
 <nav>
     <ul><li><a href="{% url 'Bill_2_split:IndexView' %}">
-            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"></a></li>
+            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"><span>Homepage</span></a></li>
     <li><a href="{% url 'Bill_2_split:UserView' %}">
-            <img src="{% static 'Bill_2_split/icons/user.png' %}"></a></li>
+            <img src="{% static 'Bill_2_split/icons/user.png' %}"><span>User selection</span></a></li>
     <li><a href="{% url 'Bill_2_split:ListOfLedgersView' user.pk %}">
-            <img src="{% static 'Bill_2_split/icons/ledgers.png' %}"></a></li>
+            <img src="{% static 'Bill_2_split/icons/ledgers.png' %}"><span>Ledgers overview</span></a></li>
     <li><a href="{% url 'Bill_2_split:LedgerDetailView' ledger.pk user.pk %}">
-            <img src="{% static 'Bill_2_split/icons/ledger.png' %}"></a></li></ul>
+            <img src="{% static 'Bill_2_split/icons/ledger.png' %}"><span>Ledger detail</span></a></li></ul>
 
     <ul>
-        <li><a href="{% url 'Bill_2_split:PaymentDetailView' ledger.pk user.pk payment.pk %}">
-            <img src="{% static 'Bill_2_split/icons/glass.png' %}"></a></li>
+        <li><a href="#">
+            <img src="{% static 'Bill_2_split/icons/glass.png' %}"><span>You are here</span></a></li>
     </ul>
 
     <ul>
@@ -57,16 +57,23 @@
     {% endfor %}
 
 <nav>
+    <ul></ul>
     <ul>
         <li>
-            <a href="#"> Edit payment</a>
+            <a href="{% url 'Bill_2_split:PaymentEditView' payment_pk=payment.pk ledger_pk=ledger.pk user_pk=user.pk %}"> Edit payment</a>
         </li>
+    </ul>
+</nav>
 
+<nav>
+    <ul></ul>
+    <ul>
         <li>
             <a href="#"> Delete payment</a>
         </li>
 
     </ul>
 </nav>
+
 
 {% endblock %}

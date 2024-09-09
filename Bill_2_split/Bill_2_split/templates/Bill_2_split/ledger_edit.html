@@ -1,0 +1,15 @@
+{% extends 'Bill_2_split/_base.html' %}
+
+{% block Bill_2_split_content %}
+{% load static %}
+
+<h1>Edit Ledger: {{ ledger.name }}</h1>
+    <form action="{% url 'Bill_2_split:LedgerEditView' ledger.pk user.pk %}" method="POST">
+        {% csrf_token %}
+
+        {{ form }}
+
+        <button type="submit">Save changes</button>
+    </form>
+
+{% endblock %}

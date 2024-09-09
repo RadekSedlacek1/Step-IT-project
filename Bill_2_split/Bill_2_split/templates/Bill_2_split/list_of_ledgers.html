@@ -5,13 +5,13 @@
 
 <nav>
     <ul><li><a href="{% url 'Bill_2_split:IndexView' %}">
-            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"></a></li>
+            <img src="{% static 'Bill_2_split/icons/home_page.png' %}"><span>Homepage</span></a></li>
     <li><a href="{% url 'Bill_2_split:UserView' %}">
-            <img src="{% static 'Bill_2_split/icons/user.png' %}"></a></li></ul>
+            <img src="{% static 'Bill_2_split/icons/user.png' %}"><span>User selection</span></a></li></ul>
 
     <ul>
         <li><a href="{% url 'Bill_2_split:ListOfLedgersView' user.pk %}">
-            <img src="{% static 'Bill_2_split/icons/ledgers.png' %}"></a></li>
+            <img src="{% static 'Bill_2_split/icons/ledgers.png' %}"><span>You are here</span></a></li>
     </ul>
 
     <ul>
@@ -21,8 +21,12 @@
 </nav>
 
 <h1>
-    This is list of ledgers for the user {{ object.name }}
+    Hello <strong>{{ user.name }} </strong>!
 </h1>
+
+<h3>
+    This is the overview  of your ledgers
+</h3>
 
 <ul>
     {% for ledger in ledgers %}
@@ -39,7 +43,7 @@
 <nav>
     <ul>
         <li>
-            <a href="add/"> Add new ledger</a>
+            <a href="{% url 'Bill_2_split:LedgerAddView' user.pk %}"> Add new ledger</a>
         </li>
     </ul>
 </nav>

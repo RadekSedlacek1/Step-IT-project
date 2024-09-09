@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from datetime import datetime
 from .forms import RelationForm
 from django.shortcuts import redirect, get_object_or_404
+from django.views.generic.edit import UpdateView
 
 class IndexView(generic.TemplateView):
     template_name = 'Bill_2_split/index.html'
@@ -33,9 +34,9 @@ class ListOfLedgersView(generic.TemplateView):
         context['ledgers'] = Ledger.objects.filter(payment__relation__user=user).distinct()  # vyfiltruj ledgery pro daného uživatele
         return context
 
-class LedgerAdd(generic.CreateView):
+class LedgerAddView(generic.CreateView):
     model = Ledger
-    template_name = 'Bill_2_split/LedgerAdd.html'
+    template_name = 'Bill_2_split/ledger_add.html'
     fields = ['name', 'desc']
 
     def get_context_data(self, **kwargs):
@@ -76,7 +77,6 @@ class LedgerAdd(generic.CreateView):
             }
         )
 
-        # Přesměruj na správnou URL
         return HttpResponseRedirect(reverse('Bill_2_pay:ListOfLedgersView', kwargs={'user_pk': user.pk}))
 
 class LedgerDetailView(generic.DetailView):
@@ -102,6 +102,33 @@ class LedgerDetailView(generic.DetailView):
         context['payments'] = Payment.objects.filter(ledger=ledger)
 
         return context
+
+class LedgerEditView(UpdateView):
+    model = Ledger
+    template_name = 'Bill_2_split/ledger_edit.html'
+    fields = ['name', 'desc']
+    context_object_name = 'ledger'
+
+    def get_object(self, queryset=None):
+        ledger_pk = self.kwargs.get('ledger_pk')
+        return get_object_or_404(Ledger, pk=ledger_pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.kwargs.get('user_pk')
+        context['user'] = get_object_or_404(User, pk=user_id)
+        return context
+
+    def form_valid(self, form):
+        user_id = self.kwargs.get('user_pk')
+        user = get_object_or_404(User, pk=user_id)
+        form.instance.user = user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        ledger = self.object
+        user_id = self.kwargs.get('user_pk')
+        return reverse('Bill_2_split:LedgerDetailView', kwargs={'ledger_pk': ledger.pk, 'user_pk': user_id})
 
 class PaymentAddView(generic.CreateView):
     model = Payment
@@ -131,10 +158,67 @@ class PaymentAddView(generic.CreateView):
             'ledger_pk': self.object.ledger.pk,
             'user_pk': self.object.user.pk})
 
+class PaymentDetailView(generic.DetailView):
+    model = Payment
+    template_name = 'Bill_2_split/payment_detail.html'
+    title = 'Payment detail'
 
-##########################################################################
+    def get_object(self):
+        payment_pk = self.kwargs.get('payment_pk')
+        return Payment.objects.get(pk=payment_pk)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        payment = self.get_object()
 
+        user_id = self.kwargs.get('user_pk')
+        user = User.objects.get(pk=user_id)
+
+        ledger_id = self.kwargs.get('ledger_pk')
+        ledger = Ledger.objects.get(pk=ledger_id)
+
+        relations = Relation.objects.filter(payment=payment)
+
+        balance_change = calculate_relation_costs(relations, payment.cost)
+
+        context['ledger'] = ledger
+        context['user'] = user
+        context['payment'] = payment
+        context['relations'] = relations
+        context['balance_change'] = balance_change
+
+        return context
+
+class PaymentEditView(UpdateView):
+    model = Payment
+    template_name = 'Bill_2_split/payment_edit.html'
+    fields = ['name', 'cost', 'desc']
+
+    def get_object(self, queryset=None):
+        payment_pk = self.kwargs.get('payment_pk')
+        return get_object_or_404(Payment, pk=payment_pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.kwargs.get('user_pk')
+        context['user'] = get_object_or_404(User, pk=user_id)
+        context['ledger'] = self.object.ledger
+        return context
+
+    def form_valid(self, form):
+        user_id = self.kwargs.get('user_pk')
+        user = get_object_or_404(User, pk=user_id)
+        form.instance.user = user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        ledger = self.object.ledger
+        user_id = self.kwargs.get('user_pk')
+        return reverse('Bill_2_split:RelationsEditView', kwargs={
+                           'payment_pk': self.object.pk,
+                           'ledger_pk': ledger.pk,
+                           'user_pk': user_id
+        })
 class RelationsAddView(generic.DetailView):
     model = Payment
     template_name = 'Bill_2_split/relation_add.html'
@@ -174,37 +258,49 @@ class RelationsAddView(generic.DetailView):
             'user_pk': self.kwargs.get('user_pk')
         }))
 
-
-
-##########################################################################
-
-class PaymentDetailView(generic.DetailView):
+class RelationsEditView(UpdateView):
     model = Payment
-    template_name = 'Bill_2_split/payment_detail.html'
-    title = 'Payment detail'
+    template_name = 'Bill_2_split/relation_edit.html'
+    fields = ['name', 'cost', 'desc']
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         payment_pk = self.kwargs.get('payment_pk')
-        return Payment.objects.get(pk=payment_pk)
+        return get_object_or_404(Payment, pk=payment_pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        payment = self.get_object()
-
         user_id = self.kwargs.get('user_pk')
-        user = User.objects.get(pk=user_id)
-
-        ledger_id = self.kwargs.get('ledger_pk')
-        ledger = Ledger.objects.get(pk=ledger_id)
-
-        relations = Relation.objects.filter(payment=payment)
-
-        balance_change = calculate_relation_costs(relations, payment.cost)
-
-        context['ledger'] = ledger
-        context['user'] = user
-        context['payment'] = payment
-        context['relations'] = relations
-        context['balance_change'] = balance_change
-
+        context['user'] = get_object_or_404(User, pk=user_id)
+        context['ledger'] = self.object.ledger
+        relations = Relation.objects.filter(payment=self.object)
+        users = User.objects.all()
+        relation_forms = [RelationForm(instance=rel, prefix=str(rel.user.id)) for rel in relations]
+        context['relation_forms'] = relation_forms
         return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        users = User.objects.all()
+        for user in users:
+            form_prefix = str(user.id)
+            relation_form = RelationForm(self.request.POST, prefix=form_prefix)
+            if relation_form.is_valid():
+                relation = relation_form.save(commit=False)
+                relation.payment = self.object
+                relation.save()
+            else:
+                print(f"Form with prefix {form_prefix} is invalid: {relation_form.errors}")
+
+        return response
+
+    def get_success_url(self):
+        ledger = self.object.ledger
+        user_id = self.kwargs.get('user_pk')
+        return reverse('Bill_2_split:PaymentDetailView', kwargs={
+                           'payment_pk': self.object.pk,
+                           'ledger_pk': ledger.pk,
+                           'user_pk': user_id
+        })
+
+

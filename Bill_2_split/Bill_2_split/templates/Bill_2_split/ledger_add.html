@@ -4,7 +4,7 @@
 {% load static %}
 
 <h1>Add new ledger</h1>
-    <form action="{% url 'Bill_2_split:LedgerAdd' user_pk=user.pk %}" method="POST">
+    <form action="{% url 'Bill_2_split:LedgerAddView' user_pk=user.pk %}" method="POST">
 
         {% csrf_token %}
 

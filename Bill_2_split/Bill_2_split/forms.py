@@ -27,8 +27,3 @@ class LoginForm(AuthenticationForm):
         label='Password',
         widget=forms.PasswordInput(attrs={'placeholder': 'Password'}),
     )
-
-class RelationForm(forms.ModelForm):
-    class Meta:
-        model = Relation
-        fields = ['user', 'relation']

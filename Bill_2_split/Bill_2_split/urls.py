@@ -20,22 +20,35 @@ urlpatterns = [
          name='ListOfLedgersView'),
 
     path('list_of_ledgers/<int:user_pk>/add/',
-         views.LedgerAdd.as_view(),
-         name='LedgerAdd'),
+         views.LedgerAddView.as_view(),
+         name='LedgerAddView'),
 
     path('ledger_detail/<int:ledger_pk>/<int:user_pk>/',
          views.LedgerDetailView.as_view(),
          name='LedgerDetailView'),
 
+    path('ledger_detail/<int:ledger_pk>/<int:user_pk>/edit/',
+         views.LedgerEditView.as_view(),
+         name='LedgerEditView'),
+
     path('ledger_detail/<int:ledger_pk>/<int:user_pk>/add/',
          views.PaymentAddView.as_view(),
          name='PaymentAddView'),
 
-    path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/add/',
-         views.RelationsAddView.as_view(),
-         name='RelationsAddView'),
-
     path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/',
          views.PaymentDetailView.as_view(),
          name='PaymentDetailView'),
+
+    path('payment_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/edit/',
+         views.PaymentEditView.as_view(),
+         name='PaymentEditView'),
+
+    path('relation_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/add/',
+         views.RelationsAddView.as_view(),
+         name='RelationsAddView'),
+
+    path('relation_detail/<int:payment_pk>/<int:ledger_pk>/<int:user_pk>/edit/',
+         views.RelationsEditView.as_view(),
+         name='RelationsEditView'),
+
 ]
