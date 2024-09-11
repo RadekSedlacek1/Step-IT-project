@@ -172,8 +172,13 @@ class PaymentAddView(generic.CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         ledger_id = self.kwargs.get('ledger_pk')
+        user_id = self.kwargs.get('user_pk')
+
         ledger = Ledger.objects.get(pk=ledger_id)
+        user = User.objects.get(pk=user_id)
+
         context['ledger'] = ledger
+        context['user'] = user
         return context
 
     def form_valid(self, form):
